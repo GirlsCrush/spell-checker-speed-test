@@ -190,6 +190,46 @@ public:
     }
 };
 
+inline void tolowerPtr(char *p) 
+{
+    switch(*p)
+    {
+    case 'A':*p='a'; return;
+    case 'B':*p='b'; return;
+    case 'C':*p='c'; return;
+    case 'D':*p='d'; return;
+    case 'E':*p='e'; return;
+    case 'F':*p='f'; return;
+    case 'G':*p='g'; return;
+    case 'H':*p='h'; return;
+    case 'I':*p='i'; return;
+    case 'J':*p='j'; return;
+    case 'K':*p='k'; return;
+    case 'L':*p='l'; return;
+    case 'M':*p='m'; return;
+    case 'N':*p='n'; return;
+    case 'O':*p='o'; return;
+    case 'P':*p='p'; return;
+    case 'Q':*p='q'; return;
+    case 'R':*p='r'; return;
+    case 'S':*p='s'; return;
+    case 'T':*p='t'; return;
+    case 'U':*p='u'; return;
+    case 'V':*p='v'; return;
+    case 'W':*p='w'; return;
+    case 'X':*p='x'; return;
+    case 'Y':*p='y'; return;
+    case 'Z':*p='z'; return;
+    };
+}
+
+inline void tolowerStr(std::string& s)
+{
+    char* c=const_cast<char*>(s.c_str());
+size_t l = s.size();
+  for(char* c2=c;c2<c+l;c2++)tolowerPtr(c2); 
+};
+
 class SpellChecker_Trie : public SpellChecker_Impl
 {
 private:
@@ -235,9 +275,16 @@ public:
     }
     bool check(const std::string &word) const {
         std::string wordLower(word);
-        std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower); 
+        //std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower);
+        // for (int i = 0; i < wordLower.size(); ++i)
+        //     if (wordLower[i] !islower(wordLower[i]))
+        //         wordLower[i] = tolower(wordLower[i]);
+        // tolowerStr(wordLower);
+        for ( auto it = wordLower.begin(); it != wordLower.end(); ++it )
+            *it |= 0x20;
+        
         TrieNode *tmp = root;
-        for (char c : wordLower) {
+        for (char &c : wordLower) {
             tmp = tmp->next[getIndex(c)];
             if (!tmp){
                 return false;
