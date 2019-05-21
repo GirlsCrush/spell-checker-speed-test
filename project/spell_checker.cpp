@@ -31,12 +31,15 @@ public:
     bool check(const std::string &word) const{ 
         std::string wordLower(word);
         std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower);
-        return std::find(dict.begin(), dict.end(), wordLower) != dict.end(); 
+        for (std::string s : dict)
+            if (s == wordLower)
+                return true;
+        return false; 
     }
     void add(const std::string &word){
         std::string wordLower(word);
         std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower);
-        if (SpellChecker::is_valid(wordLower) && std::find(dict.begin(), dict.end(), wordLower) == dict.end())
+        if (!check(wordLower))
             dict.push_back(wordLower);
     }
     size_t size(void) const{ return dict.size(); }
@@ -63,8 +66,7 @@ public:
     void add(const std::string &word){
         std::string wordLower(word);
         std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower);
-        if (SpellChecker::is_valid(wordLower))
-            dict.insert(wordLower);
+        dict.insert(wordLower);
     }
     size_t size(void) const{ return dict.size(); }
 private:
@@ -90,8 +92,7 @@ public:
     void add(const std::string &word){
         std::string wordLower(word);
         std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower);
-        if (SpellChecker::is_valid(wordLower))
-            dict.insert(wordLower);
+        dict.insert(wordLower);
     }
     size_t size(void) const{ return dict.size(); }
 private:
@@ -262,7 +263,7 @@ SpellChecker::SpellChecker(const enum ContainerType type)
     switch (type)
     {
     case ContainerType::Vector:
-        impl_ = std::make_unique<SpellChecker_Vector>();
+        impl_ = std::make_unique<SpellChecker_Set>();
         break;
     case ContainerType::Set:
         impl_ = std::make_unique<SpellChecker_Set>();
