@@ -1,0 +1,4 @@
+#Don't track .o and .a files
+.vscode/
+/build.sh
+build/
