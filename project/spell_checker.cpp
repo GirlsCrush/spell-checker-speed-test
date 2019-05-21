@@ -280,8 +280,14 @@ public:
 		//    *it |= 0x20;
 
 		TrieNode * tmp = root;
-		for (char c : word) {
-			tmp = tmp->next[getIndex(c | 0x20)];
+		// for (char c : word) {
+		// 	tmp = tmp->next[getIndex(c | 0x20)];
+		// 	if (!tmp) {
+		// 		return false;
+		// 	}
+		// }
+		for (int i = 0; i < word.size(); ++i) {
+			tmp = tmp->next[getIndex(word[i] | 0x20)];
 			if (!tmp) {
 				return false;
 			}
