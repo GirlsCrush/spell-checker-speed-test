@@ -180,14 +180,11 @@ class TrieNode {
 public:
     TrieNode() = default;
 	bool end = false;
-	TrieNode* next[27] = {nullptr, nullptr , nullptr , nullptr , nullptr , 
-		nullptr , nullptr , nullptr , nullptr , nullptr , nullptr , nullptr , 
-		nullptr , nullptr , nullptr , nullptr , nullptr , nullptr , nullptr , 
-		nullptr , nullptr , nullptr , nullptr , nullptr , nullptr , nullptr , nullptr};
-    ~TrieNode() {
-        for (int i = 0; i < 27; ++i)
-            delete next[i];
-    }
+	std::shared_ptr<TrieNode> next[27];
+    // ~TrieNode() {
+    //     for (int i = 0; i < 27; ++i)
+    //         delete next[i];
+    // }
 };
 
 inline void tolowerPtr(char *p) 
@@ -233,8 +230,8 @@ size_t l = s.size();
 class SpellChecker_Trie : public SpellChecker_Impl
 {
 private:
-    void push(const std::string &word) {
-        TrieNode *tmp = root;
+    inline void push(const std::string &word) {
+        std::shared_ptr<TrieNode> tmp = root;
         std::string::const_iterator it;
         for (it = word.begin(); it != word.end(); ++it) {
 			unsigned short index = getIndex(*it);
@@ -248,7 +245,7 @@ private:
         //     return;
         // }
 		if (it != word.end())
-			tmp = tmp->next[getIndex(*it)] = new TrieNode;
+			tmp = tmp->next[getIndex(*it)] = std::shared_ptr<TrieNode>(new TrieNode);
         else if (!tmp->end) {
             tmp->end = true;
             ++_size;
@@ -259,7 +256,7 @@ private:
         }
 
         while (++it != word.end()) {
-            tmp = tmp->next[getIndex(*it)] = new TrieNode;
+            tmp = tmp->next[getIndex(*it)] = std::shared_ptr<TrieNode>(new TrieNode);
         }
 		tmp->end = true;
         ++_size;
@@ -275,17 +272,17 @@ public:
     }
     bool check(const std::string &word) const {
         std::string wordLower(word);
-        std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower);
+        //std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower);
         // for (int i = 0; i < wordLower.size(); ++i)
         //     if (wordLower[i] !islower(wordLower[i]))
         //         wordLower[i] = tolower(wordLower[i]);
         // tolowerStr(wordLower);
-        // for ( auto it = wordLower.begin(); it != wordLower.end(); ++it )
-        //     *it |= 0x20;
+        //for ( auto it = wordLower.begin(); it != wordLower.end(); ++it )
+        //    *it |= 0x20;
         
-        TrieNode *tmp = root;
-        for (char &c : wordLower) {
-            tmp = tmp->next[getIndex(c)];
+        std::shared_ptr<TrieNode> tmp = root;
+        for (char c : word) {
+            tmp = tmp->next[getIndex(c | 0x20)];
             if (!tmp){
                 return false;
             }
@@ -299,9 +296,9 @@ public:
         }
     size_t size(void) const{ return _size; }
     SpellChecker_Trie() : root(new TrieNode()) {}
-    ~SpellChecker_Trie() { delete root; }
+    //~SpellChecker_Trie() { delete root; }
 private:
-    TrieNode* root;
+    std::shared_ptr<TrieNode> root;
     size_t _size = 0;
 };
 
