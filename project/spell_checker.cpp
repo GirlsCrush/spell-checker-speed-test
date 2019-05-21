@@ -275,13 +275,13 @@ public:
     }
     bool check(const std::string &word) const {
         std::string wordLower(word);
-        //std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower);
+        std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower);
         // for (int i = 0; i < wordLower.size(); ++i)
         //     if (wordLower[i] !islower(wordLower[i]))
         //         wordLower[i] = tolower(wordLower[i]);
         // tolowerStr(wordLower);
-        for ( auto it = wordLower.begin(); it != wordLower.end(); ++it )
-            *it |= 0x20;
+        // for ( auto it = wordLower.begin(); it != wordLower.end(); ++it )
+        //     *it |= 0x20;
         
         TrieNode *tmp = root;
         for (char &c : wordLower) {
