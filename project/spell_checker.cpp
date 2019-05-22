@@ -20,19 +20,21 @@ inline int getIndex(char c) {
 class SpellChecker_Vector : public SpellChecker_Impl
 {
 public:
+	SpellChecker_Vector() : dict(27) {}
 	void load(const std::string &dictionary) {
 		std::ifstream file(dictionary);
 		if (file.fail())
 			throw SpellChecker_InvalidDictFile();
 		std::string tmp;
 		while (file >> tmp)
-			dict.push_back(tmp);
+			dict[getIndex(tmp[0])].push_back(tmp);
 	}
 	bool check(const std::string &word) const {
 		std::string wordLower(word);
 		std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower);
-		for (std::string s : dict)
-			if (s == wordLower)
+		const std::vector<std::string> &v = dict[getIndex(wordLower[0])];
+		for (int i = 0; i < v.size(); ++i)
+			if (v[i] == wordLower)
 				return true;
 		return false;
 	}
@@ -40,11 +42,15 @@ public:
 		std::string wordLower(word);
 		std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower);
 		if (!check(wordLower))
-			dict.push_back(wordLower);
+			dict[getIndex(wordLower[0])].push_back(wordLower);
 	}
-	size_t size(void) const { return dict.size(); }
+	size_t size(void) const { 
+		size_t res = 0;
+		for (int i = 0; i < dict.size(); ++i)
+			res += dict[i].size();
+		return res; }
 private:
-	std::vector<std::string> dict;
+	std::vector<std::vector<std::string>> dict;
 };
 
 class SpellChecker_Set : public SpellChecker_Impl
@@ -312,7 +318,7 @@ SpellChecker::SpellChecker(const enum ContainerType type)
 	switch (type)
 	{
 	case ContainerType::Vector:
-		impl_ = std::make_unique<SpellChecker_Set>();
+		impl_ = std::make_unique<SpellChecker_Vector>();
 		break;
 	case ContainerType::Set:
 		impl_ = std::make_unique<SpellChecker_Set>();
@@ -356,7 +362,7 @@ size_t SpellChecker::size(void) const {
 bool SpellChecker::is_valid(const std::string &word) {
 	if (word.size() > 45)
 		return false;
-	if (!isalpha(word.front()))
+	if (!isalpha(word[0]))
 		return false;
 	for (int i = 1; i < word.size(); ++i)
 		if (!isalpha(word[i]) && word[i] != '\'')
