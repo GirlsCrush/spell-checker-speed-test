@@ -328,13 +328,14 @@ bool SpellChecker::is_valid(const std::string &word) {
 	// for (const char &c : word)
 	// 	if (!isalpha(c) && c != '\'')
 	// 		return false;
-	// for (int i = 1; i < word.size(); ++i)
-	// 	if (!isalpha(word[i]) && word[i] != '\'')
+	// it = (word.begin());
+	// do {
+	// 	if (!isalpha(*it) && *it != '\'')
 	// 		return false;
-	it = (word.begin());
-	do {
-		if (!isalpha(*it) && *it != '\'')
+	// } while (++it != word.end());
+	for (int i = 1; i < word.size(); ++i)
+		if (!isalpha(word[i]) && word[i] != '\'')
 			return false;
-	} while (++it != word.end());
+	
 	return true;
 }
