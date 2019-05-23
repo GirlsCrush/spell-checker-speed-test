@@ -15,7 +15,7 @@ unsigned int string_hash(const std::string &word, unsigned int max) {
 }
 
 inline int getIndex(char c) {
-	return (c - 'a' >= 0 ? c - 'a' : 26);
+	return (c != '\'' ? c & ~0x60 : 0);
 }
 class SpellChecker_Vector : public SpellChecker_Impl
 {
@@ -199,39 +199,6 @@ public:
 
 class SpellChecker_Trie : public SpellChecker_Impl
 {
-private:
-	inline void push(const std::string &word) {
-		TrieNode * tmp = root;
-		std::string::const_iterator it = word.begin();
-		unsigned short index;
-		for (; it != word.end(); ++it) {
-			index = getIndex(*it);
-			if (!tmp->next[index]) {
-				break;
-			}
-			tmp = tmp->next[index];
-		}
-		// if (it == word.end()) {
-		//     ++_size;
-		//     return;
-		// }
-		if (it != word.end())
-			tmp = tmp->next[getIndex(*it)] = (new TrieNode);
-		else if (!tmp->end) {
-			tmp->end = true;
-			++_size;
-			return;
-		}
-		else {
-			return;
-		}
-
-		while (++it != word.end()) {
-			tmp = tmp->next[getIndex(*it)] = (new TrieNode);
-		}
-		tmp->end = true;
-		++_size;
-	}
 public:
 	inline void load(const std::string &dictionary) {
 		std::ifstream file(dictionary);
@@ -252,48 +219,19 @@ public:
 				}
 				tmp = tmp->next[index];
 			}
-			// if (it == word.end()) {
-			//     ++_size;
-			//     return;
-			// }
-			if (it != word.end())
+			
+			do {
 				tmp = tmp->next[getIndex(*it)] = (new TrieNode);
-			else if (!tmp->end) {
-				tmp->end = true;
-				++_size;
-				continue;
-			}
-			else {
-				continue;
-			}
-
-			while (++it != word.end()) {
-				tmp = tmp->next[getIndex(*it)] = (new TrieNode);
-			}
+			} while (++it != word.end());
 			tmp->end = true;
 			++_size;
 		}
 		//push(tmp);
 	}
 	inline bool check(const std::string &word) const {
-		//std::string wordLower(word);
-		//std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower);
-		// for (int i = 0; i < wordLower.size(); ++i)
-		//     if (wordLower[i] !islower(wordLower[i]))
-		//         wordLower[i] = tolower(wordLower[i]);
-		// tolowerStr(wordLower);
-		//for ( auto it = wordLower.begin(); it != wordLower.end(); ++it )
-		//    *it |= 0x20;
-
 		TrieNode * tmp = root;
-		// for (char c : word) {
-		// 	tmp = tmp->next[getIndex(c | 0x20)];
-		// 	if (!tmp) {
-		// 		return false;
-		// 	}
-		// }
 		for (int i = 0; i < word.size(); ++i) {
-			tmp = tmp->next[getIndex(word[i] | 0x20)];
+			tmp = tmp->next[getIndex(word[i])];
 			if (!tmp) {
 				return false;
 			}
@@ -301,9 +239,28 @@ public:
 		return tmp->end;
 	}
 	inline void add(const std::string &word) {
-		std::string wordLower(word);
-		std::transform(word.begin(), word.end(), wordLower.begin(), ::tolower);
-		push(wordLower);
+		TrieNode * tmp = root;
+		std::string::const_iterator it(word.begin());
+		for (; it != word.end(); ++it) {
+			if (!tmp->next[getIndex((*it))]) {
+				break;
+			}
+			tmp = tmp->next[getIndex((*it))];
+		}
+		
+		if (it == word.end()){
+			if (!tmp->end) {
+				tmp->end = true;
+				++_size;
+			}
+			return;
+		}
+
+		do {
+			tmp = tmp->next[(getIndex(*it))] = (new TrieNode);
+		} while (++it != word.end());
+		tmp->end = true;
+		++_size;
 	}
 	inline size_t size(void) const { return _size; }
 	SpellChecker_Trie() : root(new TrieNode()) {}
@@ -364,6 +321,9 @@ bool SpellChecker::is_valid(const std::string &word) {
 		return false;
 	if (!isalpha(word[0]))
 		return false;
+	// for (const char &c : word)
+	// 	if (!isalpha(c) && c != '\'')
+	// 		return false;
 	for (int i = 1; i < word.size(); ++i)
 		if (!isalpha(word[i]) && word[i] != '\'')
 			return false;
