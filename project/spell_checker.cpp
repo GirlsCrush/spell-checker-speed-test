@@ -9,6 +9,8 @@
 
 const unsigned int MAX_HASH = 501037;
 
+std::string::const_iterator it;
+
 unsigned int string_hash(const std::string &word, unsigned int max) {
 	std::hash<std::string> hash_str;
 	return hash_str(word) % MAX_HASH;
@@ -206,9 +208,8 @@ public:
 			throw SpellChecker_InvalidDictFile();
 		std::string word;
 
-		std::string::const_iterator it;
+		//std::string::const_iterator it;
 		unsigned short index;
-		TrieNode * tmp;
 		while (file >> word) {
 			tmp = root;
 			it = word.begin();
@@ -228,8 +229,8 @@ public:
 		}
 		//push(tmp);
 	}
-	inline bool check(const std::string &word) const {
-		TrieNode * tmp = root;
+	inline bool check(const std::string &word) const{
+		tmp = root;
 		for (int i = 0; i < word.size(); ++i) {
 			tmp = tmp->next[getIndex(word[i])];
 			if (!tmp) {
@@ -239,8 +240,9 @@ public:
 		return tmp->end;
 	}
 	inline void add(const std::string &word) {
-		TrieNode * tmp = root;
-		std::string::const_iterator it(word.begin());
+		tmp = root;
+		//std::string::const_iterator 
+		it = word.begin();
 		for (; it != word.end(); ++it) {
 			if (!tmp->next[getIndex((*it))]) {
 				break;
@@ -266,9 +268,11 @@ public:
 	SpellChecker_Trie() : root(new TrieNode()) {}
 	~SpellChecker_Trie() { delete root; }
 private:
+	static TrieNode * tmp ;
 	TrieNode * root;
 	size_t _size = 0;
 };
+	TrieNode* SpellChecker_Trie::tmp = nullptr;
 
 SpellChecker::SpellChecker(const enum ContainerType type)
 {
@@ -324,8 +328,13 @@ bool SpellChecker::is_valid(const std::string &word) {
 	// for (const char &c : word)
 	// 	if (!isalpha(c) && c != '\'')
 	// 		return false;
-	for (int i = 1; i < word.size(); ++i)
-		if (!isalpha(word[i]) && word[i] != '\'')
+	// for (int i = 1; i < word.size(); ++i)
+	// 	if (!isalpha(word[i]) && word[i] != '\'')
+	// 		return false;
+	it = (word.begin());
+	do {
+		if (!isalpha(*it) && *it != '\'')
 			return false;
+	} while (++it != word.end());
 	return true;
 }
