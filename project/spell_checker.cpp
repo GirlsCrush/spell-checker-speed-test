@@ -321,9 +321,7 @@ size_t SpellChecker::size(void) const {
 
 // is string recognized as word to check for spelling or should be skipped
 bool SpellChecker::is_valid(const std::string &word) {
-	if (word.size() > 45)
-		return false;
-	if (!isalpha(word[0]))
+	if (!((isalpha(word.back()) || word.back() == '\'') && (isalpha(word[0]))) || word.size() > 45)
 		return false;
 	// for (const char &c : word)
 	// 	if (!isalpha(c) && c != '\'')
@@ -333,8 +331,8 @@ bool SpellChecker::is_valid(const std::string &word) {
 	// 	if (!isalpha(*it) && *it != '\'')
 	// 		return false;
 	// } while (++it != word.end());
-	for (int i = 1; i < word.size(); ++i)
-		if (!isalpha(word[i]) && word[i] != '\'')
+	for (int i = 1; i < word.size() - 1; ++i)
+		if (!(isalpha(word[i]) || word[i] == '\''))
 			return false;
 	
 	return true;
