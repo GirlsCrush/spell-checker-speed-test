@@ -24,7 +24,3 @@ Notes:
 Word is considered invalid if:
  * exceeds maximum length for a word
  * has non alpha characters or begins with apostrophe
-
-The list of files which are allowed to be modified:
-* project/spell_check.cpp
-
