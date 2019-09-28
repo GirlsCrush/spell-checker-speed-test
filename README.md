@@ -1,8 +1,8 @@
 # Spell Checker
 
-Complete implementation of several variants of SpellChecker class. Do you best to outperform std::unordered_set version.
+Implementations of several variants of SpellChecker class (Using different ways of storing information). THe best perfomance is provided by Trie version.
 
-Provide functionality:
+Provided functionality:
  * ability to select underlined container: std::vector, std::set, std::unordered_set, your own hash table and trie implementations. 
  Selection is based on ContainerType value (constructor parameter)
  * Your fastest implementations should correspond to ContainerType::Fastest enum member. 
